@@ -21,10 +21,6 @@ import java.util.List;
 @Component
 public class CowinAlarm {
     private static final Logger log = LoggerFactory.getLogger(CowinAlarm.class);
-
-//    private String pincode[] = {"400701", "400703", "400705", "400708", "400709"},
-//            date[] = {"14-05-2021", "15-05-2021", "16-05-2021", "17-05-2021"};
-
     private String pincode[] = {"400701", "400703", "400705", "400708", "400709"},
             date[] = {"14-05-2021"};
 
@@ -54,7 +50,6 @@ public class CowinAlarm {
     }
 
     private RootResp getRootResp(HttpResponse<String> resp) {
-        log.info(resp.getBody().toString());
         return new Gson().fromJson(resp.getBody(), RootResp.class);
     }
 
