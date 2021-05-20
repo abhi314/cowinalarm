@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Abhishek Patil
@@ -29,8 +30,9 @@ import java.util.List;
 @EnableScheduling
 public class CowinalarmApplication {
     private static final Logger log = LoggerFactory.getLogger(CowinalarmApplication.class);
-    private final String[] pincode = {"400703", "400709"};
-    private final String[] date = {"17-05-2021"};
+    private final String[] pincode = {"744302", "400709"};
+    private final String[] date = {"21-05-2021"};
+    private final boolean onlyLookingForFirstDose = true;//make this false to search for the second dose
 
     public static void main(String[] args) {
         SpringApplication.run(CowinalarmApplication.class, args);
@@ -44,7 +46,7 @@ public class CowinalarmApplication {
                                 try {
                                     resp = getResp(p, d);
                                 } catch (UnirestException e) {
-                                    e.printStackTrace();
+                                    log.error("Error while connecting to Cowin website:" + e.getMessage(), e);
                                 }
                                 assert resp != null;
                                 if (resp.getStatus() != 200) {
@@ -53,7 +55,7 @@ public class CowinalarmApplication {
                                     return;
                                 }
                                 RootResp data = getRootResp(resp);
-                                if (data.sessions.size() > 0) {
+                                if (data.getSessions().size() > 0) {
                                     dataCheck(data.sessions, p, d);
                                 }
                             }
@@ -77,12 +79,19 @@ public class CowinalarmApplication {
     }
 
     private void dataCheck(List<Session> sessionList, String pincode, String date) {
+        if (onlyLookingForFirstDose)
+            sessionList = sessionList.stream().filter(s -> s.getAvailable_capacity_dose1() > 0).collect(Collectors.toList());
         if (sessionList.size() > 0) {
-            Session temp = sessionList.get(0);
-            log.info("\nPincode: {}, Date: {}, Min-Age:{}+, capacity: {}, fee: {}, vaccine: {}",
-                    pincode, date, temp.getMin_age_limit(), temp.getAvailable_capacity(), temp.getFee(), temp.getVaccine());
             play();
+            sessionList.stream().forEach(s -> logOut(pincode, date, s));
         }
+    }
+
+    private void logOut(String pincode, String date, Session s) {
+        log.info("\nPincode: {}, Date: {}, Min-Age:{}+, capacity: {}, fee: {}, vaccine: {}",
+                pincode, date, s.getMin_age_limit(),
+                onlyLookingForFirstDose ? s.getAvailable_capacity_dose1() : s.getAvailable_capacity(), s.getFee(),
+                s.getVaccine());
     }
 
     private void play() {
