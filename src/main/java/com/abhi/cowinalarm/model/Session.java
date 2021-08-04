@@ -1,17 +1,17 @@
 package com.abhi.cowinalarm.model;
 
 public class Session {
-    public int center_id;
-    public String name;
-    public int pincode;
-    public String fee_type;
-    public String date;
-    public int available_capacity;
-    public int available_capacity_dose1;
-    public int available_capacity_dose2;
-    public String fee;
-    public int min_age_limit;
-    public String vaccine;
+    private int center_id;
+    private String name;
+    private int pincode;
+    private String fee_type;
+    private String date;
+    private int available_capacity;
+    private int available_capacity_dose1;
+    private int available_capacity_dose2;
+    private String fee;
+    private int min_age_limit;
+    private String vaccine;
 
 //    public String from;
 //    public String to;
